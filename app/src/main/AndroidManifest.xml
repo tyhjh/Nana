@@ -2,9 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dhht.nana">
 
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.DEVICE_POWER"/>
+
+
     <application
-        android:allowBackup="true"
         android:name=".app.MyApplication"
+        android:allowBackup="true"
         android:icon="@drawable/ic_logo"
         android:label="@string/app_name"
         android:roundIcon="@drawable/ic_logo"
@@ -18,17 +22,31 @@
             </intent-filter>
         </activity>
 
+
         <service
-            android:name=".service.AutoService"
-            android:label="Tyhj的辅助管家"
+            android:name=".service.WxService"
+            android:label="Tyhj的微信辅助"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
             <meta-data
                 android:name="android.accessibilityservice"
-                android:resource="@xml/accessible_service_config" />
+                android:resource="@xml/accessible_service_wx_config" />
         </service>
+
+        <service
+            android:name=".service.QqService"
+            android:label="Tyhj的QQ辅助"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessible_service_qq_config" />
+        </service>
+
 
     </application>
 
