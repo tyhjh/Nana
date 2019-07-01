@@ -32,15 +32,26 @@ public class WxService extends BaseAccessbilityService {
     public static final String WX_AUTO_REPALY = "wx_auto_repaly";
     public static final String WX_MONEY = "wx_auto_money";
 
-    public static final String HONG_BAO = "微信红包";
+    public static final String HONG_BAO = "[微信红包]";
+    public static final String ALREADY_GET = "已领取";
+
+    public static final String ALREADY_GET_ID = "com.tencent.mm:id/aqk";
 
 
     Set<String> nameSet = new HashSet<>();
 
     public static final String wxEditTextId = "com.tencent.mm:id/ami";
     public static final String wxSendButtonId = "com.tencent.mm:id/amp";
-    public static final String wxHongBaoId = "com.tencent.mm:id/aql";
-    public static final String wxOpenHongBaoId = "com.tencent.mm:id/d02";
+    public static final String wxHongBaoId = "com.tencent.mm:id/aqh";
+
+    public static final String WX_OPEN_HONG_BAO_ID = "com.tencent.mm:id/czs";
+
+    public static final String WX_HOME_ID = "com.tencent.mm:id/rq";
+
+
+    public static final String HOME_MSG_ID = "com.tencent.mm:id/b6g";
+
+    public static final String TALK_MSG_INPUT_ID = "com.tencent.mm:id/ami";
 
 
     boolean autoRepaly = false;
@@ -65,77 +76,110 @@ public class WxService extends BaseAccessbilityService {
 
         ScreenUtil.getScreenSize(this);
 
+        Logger.e("event.getClassName()：" + event.getClassName().toString());
+
         screenWidth = ScreenUtil.SCREEN_WIDTH;
         screenHeight = ScreenUtil.SCREEN_HEIGHT;
 
         if (event.getPackageName().toString().equals(WX_PACKAGE_NAME)) {
-            notifyWechat(event);
-            if (waitingOpen) {
+
+            if (event.getParcelableData() != null && event.getParcelableData() instanceof Notification) {
+                notifyWechat(event);
+            } else if (findViewByID(WX_HOME_ID) != null) {
+                List<AccessibilityNodeInfo> nodeInfos = findViewsByID(HOME_MSG_ID);
+                for (AccessibilityNodeInfo nodeInfo : nodeInfos) {
+                    if (nodeInfo.getText().toString().contains(HONG_BAO)) {
+                        performViewClick(nodeInfo);
+                        return;
+                    }
+                }
+            } else if (findViewByID(TALK_MSG_INPUT_ID) != null) {
+                try {
+                   if (hongBaoComing && autoMoney) {
+                        clickHongBaoItem();
+                    } else if (newMsg && autoRepaly) {
+                        autoRepaly();
+                    } else if (autoMoney) {
+                        clickHongBaoItems();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else if (waitingOpen && autoMoney) {
                 try {
                     openHongBao();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            } else if (hongBaoComing) {
-                try {
-                    clickHongBaoItem();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                autoRepaly();
             }
         }
+    }
+
+    private void clickHongBaoItems() throws InterruptedException {
+        List<AccessibilityNodeInfo> inputInfos = findViewsByID(wxHongBaoId);
+        while (inputInfos.size() == 0 && (System.currentTimeMillis() - startTime) < 1000) {
+            Thread.sleep(100);
+            inputInfos = findViewsByID(wxHongBaoId);
+        }
+        if (inputInfos == null || inputInfos.size() == 0) {
+            return;
+        }
+        for (AccessibilityNodeInfo info : inputInfos) {
+            if (info.getChildCount() == 1 || !ALREADY_GET_ID.equals(info.getChild(1).getViewIdResourceName())) {
+                waitingOpen = true;
+                performViewClick(info);
+                return;
+            }
+        }
+
     }
 
     private void openHongBao() throws InterruptedException {
-        if (autoMoney) {
-            Thread.sleep(600);
-            Logger.e("openHongBao：" + ScreenUtil.SCREEN_WIDTH);
-            clickOnScreen(screenWidth / 2, screenHeight * pointYScal, 50, null);
-            clickOnScreen(screenWidth / 2, screenHeight * pointYScal, 50, null);
-            waitingOpen = false;
-            Thread.sleep(1500);
-            performGlobalAction(GLOBAL_ACTION_BACK);
-            Thread.sleep(200);
-            back();
+        long startTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() - startTime < 1500) {
+            Thread.sleep(100);
+            clickOnScreen(screenWidth / 2, screenHeight * pointYScal, 10, null);
         }
+        waitingOpen = false;
+        Logger.e("使用时间为：" + (System.currentTimeMillis() - startTime));
+        Thread.sleep(200);
+        performGlobalAction(GLOBAL_ACTION_BACK);
     }
 
     private void clickHongBaoItem() throws InterruptedException {
-        if (autoMoney) {
-            Thread.sleep(500);
-            List<AccessibilityNodeInfo> inputInfos = findViewsByID(wxHongBaoId);
+        hongBaoComing = false;
+        long startTime = System.currentTimeMillis();
+        List<AccessibilityNodeInfo> inputInfos = findViewsByID(wxHongBaoId);
+        while (inputInfos.size() == 0 && (System.currentTimeMillis() - startTime) < 1000) {
+            Thread.sleep(50);
+            inputInfos = findViewsByID(wxHongBaoId);
+        }
+        Logger.e("autoMoney");
+        if (inputInfos != null && inputInfos.size() > 0) {
             waitingOpen = true;
-            hongBaoComing = false;
-            Logger.e("autoMoney");
-            if (inputInfos != null && inputInfos.size() > 0) {
-                performViewClick(inputInfos.get(inputInfos.size() - 1));
-            }
+            performViewClick(inputInfos.get(inputInfos.size() - 1));
         }
     }
 
     private void autoRepaly() {
-        if (newMsg && autoRepaly) {
-            AccessibilityNodeInfo inputInfo = findViewByID(wxEditTextId);
-            if (inputInfo != null) {
-                if (nameSet.contains(currentName)) {
-                    String msg = Const.Msg.msgs[new Random(System.currentTimeMillis()).nextInt(Const.Msg.msgs.length - 1)];
-                    repalyTxt = msg + Const.Msg.AUTO_REPALY_DEFAULT_LAST;
-                } else {
-                    nameSet.add(currentName);
-                }
-                inputText(inputInfo, repalyTxt);
-                try {
-                    Thread.sleep(300);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                newMsg = false;
-                AccessibilityNodeInfo sendBtn = findViewByID(wxSendButtonId);
-                performViewClick(sendBtn);
-                back();
+        AccessibilityNodeInfo inputInfo = findViewByID(wxEditTextId);
+        if (inputInfo != null) {
+            if (nameSet.contains(currentName)) {
+                String msg = Const.Msg.msgs[new Random(System.currentTimeMillis()).nextInt(Const.Msg.msgs.length - 1)];
+                repalyTxt = msg + Const.Msg.AUTO_REPALY_DEFAULT_LAST;
+            } else {
+                nameSet.add(currentName);
             }
+            inputText(inputInfo, repalyTxt);
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            newMsg = false;
+            AccessibilityNodeInfo sendBtn = findViewByID(wxSendButtonId);
+            performViewClick(sendBtn);
+            back();
         }
     }
 
@@ -144,6 +188,8 @@ public class WxService extends BaseAccessbilityService {
 
     }
 
+
+    long startTime = 0;
 
     /**
      * 打开通知栏消息
@@ -159,6 +205,7 @@ public class WxService extends BaseAccessbilityService {
             Logger.e(content);
             String text = msg[1].trim();
             if (text.contains(HONG_BAO)) {
+                startTime = System.currentTimeMillis();
                 hongBaoComing = true;
                 Logger.e("hongBaoComing");
                 if (autoMoney) {
@@ -186,16 +233,7 @@ public class WxService extends BaseAccessbilityService {
 
 
     private void back() {
-        try {
-            performGlobalAction(GLOBAL_ACTION_BACK);
-            Thread.sleep(200);
-            performGlobalAction(GLOBAL_ACTION_BACK);
-            Thread.sleep(200);
-            performGlobalAction(GLOBAL_ACTION_BACK);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
+        performGlobalAction(GLOBAL_ACTION_HOME);
     }
 
 
@@ -207,5 +245,8 @@ public class WxService extends BaseAccessbilityService {
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "WxService:wakeLock");
         // 获得唤醒锁
         wakeLock.acquire();
+        performGlobalAction(GLOBAL_ACTION_BACK);
+        performGlobalAction(GLOBAL_ACTION_BACK);
+        performGlobalAction(GLOBAL_ACTION_BACK);
     }
 }

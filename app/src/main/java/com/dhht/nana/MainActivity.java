@@ -47,17 +47,13 @@ public class MainActivity extends BaseActivity {
 
     @SwitchChange
     void swWx(boolean isChecked) {
-        if (!AccessbilityUtil.isAccessibilitySettingsOn(this, WxService.class)) {
-            startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
-        }
+        startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
     }
 
 
     @SwitchChange
     void swQq(boolean isChecked) {
-        if (!AccessbilityUtil.isAccessibilitySettingsOn(this, WxService.class)) {
-            startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
-        }
+        startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
     }
 
 

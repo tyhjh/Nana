@@ -124,6 +124,29 @@ public abstract class BaseAccessbilityService extends AccessibilityService {
     }
 
     /**
+     * 查找对应文本的View
+     *
+     * @param text      text
+     * @param clickable 该View是否可以点击
+     * @return View
+     */
+    public AccessibilityNodeInfo findViewByText(AccessibilityNodeInfo accessibilityNodeInfo, String text, boolean clickable) {
+        if (accessibilityNodeInfo == null) {
+            return null;
+        }
+        List<AccessibilityNodeInfo> nodeInfoList = accessibilityNodeInfo.findAccessibilityNodeInfosByText(text);
+        if (nodeInfoList != null && !nodeInfoList.isEmpty()) {
+            for (AccessibilityNodeInfo nodeInfo : nodeInfoList) {
+                if (nodeInfo != null && (nodeInfo.isClickable() == clickable)) {
+                    return nodeInfo;
+                }
+            }
+        }
+        return null;
+    }
+
+
+    /**
      * 查找对应ID的View
      *
      * @param id id
