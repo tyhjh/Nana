@@ -54,7 +54,7 @@ public class WxService extends BaseAccessbilityService {
     public static final String TALK_MSG_INPUT_ID = "com.tencent.mm:id/ami";
 
 
-    boolean autoRepaly = false;
+    boolean autoReply = false;
     boolean autoMoney = false;
     boolean newMsg = false;
     boolean hongBaoComing = false;
@@ -70,7 +70,7 @@ public class WxService extends BaseAccessbilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        autoRepaly = SharedPreferencesUtil.getBoolean(WX_AUTO_REPALY, false);
+        autoReply = SharedPreferencesUtil.getBoolean(WX_AUTO_REPALY, false);
         autoMoney = SharedPreferencesUtil.getBoolean(WX_MONEY, true);
         repalyTxt = SharedPreferencesUtil.getString(Const.Msg.WX_AUTO_REPALY_TXT, Const.Msg.AUTO_REPALY_DEFAULT);
 
@@ -82,7 +82,6 @@ public class WxService extends BaseAccessbilityService {
         screenHeight = ScreenUtil.SCREEN_HEIGHT;
 
         if (event.getPackageName().toString().equals(WX_PACKAGE_NAME)) {
-
             if (event.getParcelableData() != null && event.getParcelableData() instanceof Notification) {
                 notifyWechat(event);
             } else if (findViewByID(WX_HOME_ID) != null) {
@@ -96,8 +95,8 @@ public class WxService extends BaseAccessbilityService {
             } else if (findViewByID(TALK_MSG_INPUT_ID) != null) {
                 try {
                     if (hongBaoComing && autoMoney) {
-                        clickHongBaoItem();
-                    } else if (newMsg && autoRepaly) {
+                        clickHongBaoItems();
+                    } else if (newMsg && autoReply) {
                         autoRepaly();
                     } else if (autoMoney) {
                         clickHongBaoItems();
@@ -116,6 +115,8 @@ public class WxService extends BaseAccessbilityService {
     }
 
     private void clickHongBaoItems() throws InterruptedException {
+        hongBaoComing = false;
+        long startTime=System.currentTimeMillis();
         List<AccessibilityNodeInfo> inputInfos = findViewsByID(wxHongBaoId);
         while (inputInfos.size() == 0 && (System.currentTimeMillis() - startTime) < 1000) {
             Thread.sleep(100);
@@ -146,20 +147,6 @@ public class WxService extends BaseAccessbilityService {
         performGlobalAction(GLOBAL_ACTION_BACK);
     }
 
-    private void clickHongBaoItem() throws InterruptedException {
-        hongBaoComing = false;
-        long startTime = System.currentTimeMillis();
-        List<AccessibilityNodeInfo> inputInfos = findViewsByID(wxHongBaoId);
-        while (inputInfos.size() == 0 && (System.currentTimeMillis() - startTime) < 1000) {
-            Thread.sleep(50);
-            inputInfos = findViewsByID(wxHongBaoId);
-        }
-        Logger.e("autoMoney");
-        if (inputInfos != null && inputInfos.size() > 0) {
-            waitingOpen = true;
-            performViewClick(inputInfos.get(inputInfos.size() - 1));
-        }
-    }
 
     private void autoRepaly() {
         AccessibilityNodeInfo inputInfo = findViewByID(wxEditTextId);
@@ -217,7 +204,7 @@ public class WxService extends BaseAccessbilityService {
                     }
                 }
             } else {
-                if (autoRepaly) {
+                if (autoReply) {
                     newMsg = true;
                     currentName = name;
                     PendingIntent pendingIntent = notification.contentIntent;
