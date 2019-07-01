@@ -8,6 +8,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.dhht.annotation.CheckBoxChange;
+import com.dhht.annotation.Click;
 import com.dhht.annotation.SwitchChange;
 import com.dhht.annotation.ViewById;
 import com.dhht.nana.app.BaseActivity;
@@ -23,7 +24,7 @@ public class MainActivity extends BaseActivity {
 
 
     @ViewById
-    CheckBox ckWxMsg, ckWxMoney,ckQqMoney,ckQqMsg;
+    CheckBox ckWxMsg, ckWxMoney, ckQqMoney, ckQqMsg;
 
     @ViewById
     TextView tvBackMsg;
@@ -45,14 +46,14 @@ public class MainActivity extends BaseActivity {
     }
 
 
-    @SwitchChange
-    void swWx(boolean isChecked) {
+    @Click
+    void swWx() {
         startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
     }
 
 
-    @SwitchChange
-    void swQq(boolean isChecked) {
+    @Click
+    void swQq() {
         startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
     }
 
@@ -70,13 +71,13 @@ public class MainActivity extends BaseActivity {
 
 
     @CheckBoxChange
-    void ckQqMoney(boolean isChecked){
+    void ckQqMoney(boolean isChecked) {
 
     }
 
 
     @CheckBoxChange
-    void ckQqMsg(boolean isChecked){
+    void ckQqMsg(boolean isChecked) {
 
     }
 
@@ -84,8 +85,8 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void afterView() {
         swWx.setChecked(AccessbilityUtil.isAccessibilitySettingsOn(this, WxService.class));
-        ckWxMoney.setChecked(SharedPreferencesUtil.getBoolean(WxService.WX_MONEY,true));
-        ckWxMsg.setChecked(SharedPreferencesUtil.getBoolean(WxService.WX_AUTO_REPALY,false));
+        ckWxMoney.setChecked(SharedPreferencesUtil.getBoolean(WxService.WX_MONEY, true));
+        ckWxMsg.setChecked(SharedPreferencesUtil.getBoolean(WxService.WX_AUTO_REPALY, false));
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 

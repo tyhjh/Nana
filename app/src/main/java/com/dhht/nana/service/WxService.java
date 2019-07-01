@@ -95,7 +95,7 @@ public class WxService extends BaseAccessbilityService {
                 }
             } else if (findViewByID(TALK_MSG_INPUT_ID) != null) {
                 try {
-                   if (hongBaoComing && autoMoney) {
+                    if (hongBaoComing && autoMoney) {
                         clickHongBaoItem();
                     } else if (newMsg && autoRepaly) {
                         autoRepaly();
