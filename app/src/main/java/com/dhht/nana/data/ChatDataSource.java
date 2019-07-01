@@ -18,14 +18,12 @@ import io.reactivex.schedulers.Schedulers;
 
 public class ChatDataSource {
 
-    String key = "free";
-    String appid = "0";
     private static String resultMsg;
-    private static final int WAIT_TIME = 2000;
+    private static final int WAIT_TIME = 3000;
 
-    String originName="小豪豪";
-    String replaceName="小娜";
-    String replaceName2="娜娜";
+    String originName = "小豪豪";
+    String replaceName = "小娜";
+    String replaceName2 = "娜娜";
 
 
     RetrofiteApi retrofiteApi;
@@ -40,8 +38,8 @@ public class ChatDataSource {
     public String getReply(String msg, String userId) {
         resultMsg = null;
         startTime = System.currentTimeMillis();
-        msg=msg.replaceAll(replaceName,originName);
-        msg=msg.replaceAll(replaceName2,originName);
+        msg = msg.replaceAll(replaceName, originName);
+        msg = msg.replaceAll(replaceName2, originName);
         RequestData requestData = new RequestData(userId, msg);
         retrofiteApi.getReply(requestData.app_id, requestData.time_stamp,
                 requestData.nonce_str, requestData.sign, requestData.session, requestData.question)
@@ -51,8 +49,7 @@ public class ChatDataSource {
                     public void accept(Result<Replay> result) throws Exception {
                         Logger.e(result.toString());
                         if (result != null && result.getRet() == 0) {
-                            resultMsg = result.getData().getAnswer();
-                            resultMsg=resultMsg.replaceAll(originName,replaceName);
+                            resultMsg = result.getData().getAnswer().replaceAll(originName, replaceName);
                         }
                     }
                 });
