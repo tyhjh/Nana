@@ -7,6 +7,8 @@ import android.os.PowerManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import com.dhht.nana.app.Const;
+import com.dhht.nana.data.ChatDataSource;
 import com.orhanobut.logger.Logger;
 
 import java.util.HashSet;
@@ -38,27 +40,35 @@ public class QqService extends BaseAccessbilityService {
     public static final String QQ_MSG_SEND = "com.tencent.mobileqq:id/fun_btn";
 
 
+    public static final String AT_ME = "[有人@我]";
+    public static final String AT = "@";
+
+
+    String replyName;
     boolean autoMoney = false;
     boolean autoReply = false;
     boolean newMsg = false;
     boolean hongBaoComing = false;
 
+    ChatDataSource dataSource;
+
     String currentName;
+    String recivedMsg;
 
     Set<String> nameSet = new HashSet<>();
-
+    String repalyTxt;
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-
         autoMoney = SharedPreferencesUtil.getBoolean(QQ_MONEY, true);
         autoReply = SharedPreferencesUtil.getBoolean(QQ_AUTO_REPALY, false);
+        repalyTxt = SharedPreferencesUtil.getString(Const.Msg.WX_AUTO_REPALY_TXT, Const.Msg.AUTO_REPALY_DEFAULT);
 
         if (event.getPackageName().toString().equals(QQ_PACKAGE_NAME)) {
             try {
                 if (event.getParcelableData() != null && event.getParcelableData() instanceof Notification) {
                     notifyQq(event);
-                }else if (findViewByID(QQ_INPUT_ID) != null && autoMoney && hongBaoComing) {
+                } else if (findViewByID(QQ_INPUT_ID) != null && autoMoney && hongBaoComing) {
                     clickHongBaoItems();
                 } else if (autoReply && newMsg) {
                     autoReplyMsg();
@@ -69,8 +79,22 @@ public class QqService extends BaseAccessbilityService {
         }
     }
 
-    private void autoReplyMsg() {
-        performGlobalAction(GLOBAL_ACTION_HOME);
+    private void autoReplyMsg() throws InterruptedException {
+        newMsg = false;
+        AccessibilityNodeInfo inputInfo = findViewByID(QQ_INPUT_ID);
+        if (inputInfo != null) {
+            if (nameSet.contains(currentName)) {
+                repalyTxt = dataSource.getReply(recivedMsg, currentName);
+            } else {
+                nameSet.add(currentName);
+            }
+            inputText(inputInfo, replyName + repalyTxt);
+            Thread.sleep(200);
+            newMsg = false;
+            AccessibilityNodeInfo sendBtn = findViewByID(QQ_MSG_SEND);
+            performViewClick(sendBtn);
+            performGlobalAction(GLOBAL_ACTION_HOME);
+        }
     }
 
     private void notifyQq(AccessibilityEvent event) {
@@ -94,8 +118,20 @@ public class QqService extends BaseAccessbilityService {
                 }
             } else {
                 if (autoReply) {
+                    if (!name.contains(AT_ME)) {
+                        return;
+                    }
+                    String myName = text.substring(text.indexOf("@"), text.indexOf(" "));
+                    recivedMsg = text.substring(text.indexOf(myName) + myName.length() + 1, text.length());
+                    Logger.e("recivedMsg：" + recivedMsg);
+
+
+                    currentName = name.substring(name.indexOf(AT_ME) + AT_ME.length(), name.indexOf("(")) + " ";
+                    replyName = AT + currentName;
+
+                    Logger.e("replyName：" + replyName);
                     newMsg = true;
-                    currentName = name;
+
                     PendingIntent pendingIntent = notification.contentIntent;
                     try {
                         pendingIntent.send();
@@ -111,7 +147,7 @@ public class QqService extends BaseAccessbilityService {
         long startTime = System.currentTimeMillis();
         List<AccessibilityNodeInfo> inputInfos = getRootInActiveWindow().findAccessibilityNodeInfosByText(HONG_BAO);
         while (inputInfos.size() == 0 && (System.currentTimeMillis() - startTime) < 1000) {
-            Thread.sleep(300);
+            Thread.sleep(500);
             inputInfos = getRootInActiveWindow().findAccessibilityNodeInfosByText(HONG_BAO);
         }
         if (inputInfos == null || inputInfos.size() == 0) {
@@ -155,6 +191,7 @@ public class QqService extends BaseAccessbilityService {
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
+        dataSource = new ChatDataSource();
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         // 创建唤醒锁
         PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "QqService:wakeLock");

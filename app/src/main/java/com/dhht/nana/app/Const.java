@@ -9,7 +9,7 @@ public interface Const {
 
     interface Msg {
 
-        String AUTO_REPALY_DEFAULT = "主人暂时不在呢 --Nana";
+        String AUTO_REPALY_DEFAULT = "主人暂时不在呢，可以@我和我一起聊天 --Nana";
 
         String AUTO_REPALY_DEFAULT_LAST = "，恩恩";
 

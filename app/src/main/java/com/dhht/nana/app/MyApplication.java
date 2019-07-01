@@ -4,6 +4,7 @@ import android.app.Application;
 import android.support.annotation.Nullable;
 
 import com.dhht.annotationlibrary.view.AvoidShake;
+import com.dhht.nana.network.Retrofite;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 
@@ -22,6 +23,7 @@ public class MyApplication extends Application {
         super.onCreate();
         //设置点击时间间隔
         AvoidShake.setClickIntervalTime(400);
+        Retrofite.init();
         ToastUtil.init(this);
         SharedPreferencesUtil.init(this);
         Logger.addLogAdapter(new AndroidLogAdapter() {
