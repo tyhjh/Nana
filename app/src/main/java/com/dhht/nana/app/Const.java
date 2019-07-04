@@ -7,6 +7,15 @@ package com.dhht.nana.app;
 
 public interface Const {
 
+
+    int RUN_MODEL_QUICK_JUMP = 0;
+    int RUN_MODEL_SAVE_PIC = 1;
+    //测试图片
+    int RUN_MODEL_TEST_PIC= 2;
+    //跳一次
+    int RUN_MODEL_SINGLE_JUMP = 3;
+
+
     interface Msg {
 
         String AUTO_REPALY_DEFAULT = "主人暂时不在呢，可以@我和我一起聊天 --Nana";

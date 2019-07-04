@@ -1,5 +1,6 @@
 package com.dhht.nana;
 
+import android.Manifest;
 import android.content.Intent;
 import android.provider.Settings;
 import android.view.WindowManager;
@@ -12,10 +13,16 @@ import com.dhht.annotation.Click;
 import com.dhht.annotation.SwitchChange;
 import com.dhht.annotation.ViewById;
 import com.dhht.nana.app.BaseActivity;
+import com.dhht.nana.app.Const;
+import com.dhht.nana.jump.Jump;
+import com.dhht.nana.service.JumpService;
 import com.dhht.nana.service.QqService;
 import com.dhht.nana.service.WxService;
 import com.dhht.nana.util.AccessbilityUtil;
+import com.yorhp.recordlibrary.ScreenRecordUtil;
 
+import permison.FloatWindowManager;
+import permison.PermissonUtil;
 import util.SharedPreferencesUtil;
 
 public class MainActivity extends BaseActivity {
@@ -36,6 +43,7 @@ public class MainActivity extends BaseActivity {
         return R.layout.activity_main;
     }
 
+
     @SwitchChange
     void swInstall(boolean isChecked) {
 
@@ -44,6 +52,17 @@ public class MainActivity extends BaseActivity {
     @SwitchChange
     void swSkip(boolean isChecked) {
 
+    }
+
+
+    @Click
+    void switchJump() {
+        if (FloatWindowManager.getInstance().applyOrShowFloatWindow(MainActivity.this)) {
+            ScreenRecordUtil.getInstance().screenShot(MainActivity.this, null);
+            Jump.setStart_model(Const.RUN_MODEL_SAVE_PIC);
+            JumpService.isOpenScreenCut=true;
+            startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
+        }
     }
 
 
@@ -93,7 +112,10 @@ public class MainActivity extends BaseActivity {
         ckQqMoney.setChecked(SharedPreferencesUtil.getBoolean(QqService.QQ_MONEY, true));
         ckQqMsg.setChecked(SharedPreferencesUtil.getBoolean(QqService.QQ_AUTO_REPALY, false));
 
+        switchJump.setChecked(AccessbilityUtil.isAccessibilitySettingsOn(this, JumpService.class));
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        PermissonUtil.checkPermission(this, null, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
     }
 
 

@@ -19,7 +19,7 @@ import io.reactivex.schedulers.Schedulers;
 public class ChatDataSource {
 
     private static String resultMsg;
-    private static final int WAIT_TIME = 3000;
+    private static final int WAIT_TIME = 4000;
 
     String originName = "小豪豪";
     String replaceName = "小娜";

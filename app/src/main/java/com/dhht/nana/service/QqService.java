@@ -93,6 +93,7 @@ public class QqService extends BaseAccessbilityService {
             newMsg = false;
             AccessibilityNodeInfo sendBtn = findViewByID(QQ_MSG_SEND);
             performViewClick(sendBtn);
+            Thread.sleep(2000);
             performGlobalAction(GLOBAL_ACTION_HOME);
         }
     }

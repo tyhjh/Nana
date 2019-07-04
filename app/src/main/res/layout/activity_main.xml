@@ -18,7 +18,7 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/ll_screen_record_resolution"
+                android:id="@+id/ll_share"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
@@ -29,34 +29,10 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="APP自动安装" />
+                    android:text="跳一跳辅助" />
 
                 <Switch
-                    android:id="@+id/swInstall"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:checked="false" />
-
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/ll_screen_record_way"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:background="@color/white"
-                android:clickable="true"
-                android:orientation="horizontal"
-                android:padding="20dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="跳过广告页" />
-
-                <Switch
-                    android:id="@+id/swSkip"
+                    android:id="@+id/switchJump"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:checked="false" />
@@ -247,6 +223,51 @@
             </LinearLayout>
 
 
+            <LinearLayout
+                android:id="@+id/ll_screen_record_resolution"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:background="@color/white"
+                android:orientation="horizontal"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="APP自动安装" />
+
+                <Switch
+                    android:id="@+id/swInstall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="false" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_screen_record_way"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:background="@color/white"
+                android:clickable="true"
+                android:orientation="horizontal"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="跳过广告页" />
+
+                <Switch
+                    android:id="@+id/swSkip"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="false" />
+
+            </LinearLayout>
 
 
             <LinearLayout
@@ -290,28 +311,6 @@
                     android:layout_height="wrap_content"
                     android:gravity="right"
                     android:text="version 1.0" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/ll_share"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:background="@color/white"
-                android:orientation="horizontal"
-                android:padding="20dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="跳一跳辅助" />
-
-                <Switch
-                    android:id="@+id/switchJump"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:checked="false" />
 
             </LinearLayout>
 
