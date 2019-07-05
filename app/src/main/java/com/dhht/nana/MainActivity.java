@@ -59,7 +59,7 @@ public class MainActivity extends BaseActivity {
     void switchJump() {
         if (FloatWindowManager.getInstance().applyOrShowFloatWindow(MainActivity.this)) {
             ScreenRecordUtil.getInstance().screenShot(MainActivity.this, null);
-            Jump.setStart_model(Const.RUN_MODEL_SAVE_PIC);
+            Jump.setStart_model(Const.RUN_MODEL_QUICK_JUMP);
             JumpService.isOpenScreenCut=true;
             startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
         }

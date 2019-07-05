@@ -12,6 +12,7 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.ImageView;
 
+import com.dhht.annotation.UiThread;
 import com.dhht.nana.R;
 import com.dhht.nana.app.Const;
 import com.dhht.nana.jump.Jump;
@@ -41,9 +42,9 @@ public class JumpService extends BaseAccessbilityService {
                     isFirstComingWx = false;
                     try {
                         Thread.sleep(6000);
-                        clickOnScreen(START_POINT.x, START_POINT.y, 100, null);
+                        clickOnScreen(START_POINT.x, START_POINT.y, 10, null);
                         prepareJump();
-                        Thread.sleep(3000);
+                        Thread.sleep(2000);
                         clickListener.onClick(btnView);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -57,11 +58,10 @@ public class JumpService extends BaseAccessbilityService {
     @Override
     public void onInterrupt() {
         try {
-            windowManager.removeView(btnView);
+            windowManager.removeViewImmediate(btnView);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     private void prepareJump() {
@@ -70,8 +70,23 @@ public class JumpService extends BaseAccessbilityService {
             public void jumpStart(int x, int y, int duration) {
                 clickOnScreen(x, y, duration, null);
             }
+
+            @Override
+            public void showBtn(boolean show) {
+                showBtn(show);
+            }
         });
         createWindowView();
+    }
+
+
+    @UiThread
+    void showBtn(boolean show) {
+        if (show) {
+            btnView.setVisibility(View.VISIBLE);
+        } else {
+            btnView.setVisibility(View.INVISIBLE);
+        }
     }
 
 
@@ -94,8 +109,8 @@ public class JumpService extends BaseAccessbilityService {
         // 悬浮窗不可触摸，不接受任何事件,同时不影响后面的事件响应
         params.format = PixelFormat.RGBA_8888;
         // 设置悬浮框的宽高
-        params.width = 200;
-        params.height = 200;
+        params.width = 150;
+        params.height = 150;
         params.gravity = Gravity.TOP;
         params.x = 300;
         params.y = 200;
@@ -166,5 +181,16 @@ public class JumpService extends BaseAccessbilityService {
         performGlobalAction(GLOBAL_ACTION_BACK);
         performGlobalAction(GLOBAL_ACTION_BACK);
         performGlobalAction(GLOBAL_ACTION_BACK);
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        try {
+            windowManager.removeViewImmediate(btnView);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

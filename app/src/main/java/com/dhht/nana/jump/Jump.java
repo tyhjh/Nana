@@ -7,6 +7,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.SystemClock;
 
+import com.dhht.annotation.Background;
 import com.dhht.nana.app.Const;
 import com.dhht.nana.app.MyApplication;
 import com.dhht.nana.util.ColorUtil;
@@ -63,9 +64,6 @@ public class Jump {
     int jumpErroY = 1715;
 
 
-
-
-
     public static double chessHeight = 0.25;//截图比例
     public static double chessStart = 0.4;//开始截图的位置
     public static double jumpHeight = 0.30;
@@ -73,10 +71,10 @@ public class Jump {
     public static int bitmapWidth = 1080;
     public static int bitmapHeight = 1920;
 
-    public static int MIN_DISTENCE = (int) (50*1);
-    public static int MAX_DISTENCE = (int) (250*1);
+    public static int MIN_DISTENCE = (int) (50 * 1);
+    public static int MAX_DISTENCE = (int) (250 * 1);
 
-    public static int WHITETIME = 1450;
+    public static int WHITETIME = 1520;
 
     HsvColorLike hsvColorLike;
     LabColorLike labColorLike;
@@ -97,50 +95,50 @@ public class Jump {
 
     public static boolean start = false;
 
+    @Background
     public void start() {
-        new Thread(()->{
-            if(startTime==0){
-                startTime = System.currentTimeMillis();
-            }
-            switch (start_model) {
-                case Const.RUN_MODEL_QUICK_JUMP:
-                case Const.RUN_MODEL_SAVE_PIC:
-                    while (start) {
-                        justJump();
-                    }
-                    break;
-                case Const.RUN_MODEL_SINGLE_JUMP:
+        if (startTime == 0) {
+            startTime = System.currentTimeMillis();
+        }
+        switch (start_model) {
+            case Const.RUN_MODEL_QUICK_JUMP:
+            case Const.RUN_MODEL_SAVE_PIC:
+                while (start) {
                     justJump();
-                    break;
-                case Const.RUN_MODEL_TEST_PIC:
-                    Bitmap bitmap = BitmapFactory.decodeFile(MyApplication.savePointDir + "1.png");
-                    if (bitmap == null) {
-                        return;
-                    }
-                    setBgColor(bitmap.getPixel(0, 0));
-                    findJumpPoint(bitmap);
-                    break;
-                default:
-                    break;
-            }
-        }).start();
+                }
+                break;
+            case Const.RUN_MODEL_SINGLE_JUMP:
+                justJump();
+                break;
+            case Const.RUN_MODEL_TEST_PIC:
+                Bitmap bitmap = BitmapFactory.decodeFile(MyApplication.savePointDir + "1.png");
+                if (bitmap == null) {
+                    return;
+                }
+                setBgColor(bitmap.getPixel(0, 0));
+                findJumpPoint(bitmap);
+                break;
+            default:
+                break;
+        }
     }
 
     private void justJump() {
-
-
         Bitmap bitmap = ScreenRecordUtil.getInstance().getScreenShot();
-
         bitmapWidth = bitmap.getWidth();
         bitmapHeight = bitmap.getHeight();
 
         if (ColorUtil.colorLike(bitmap.getPixel(overBluePoint.x, overBluePoint.y), ColorUtil.buleOverColor, 10, labColorLike)
                 && ColorUtil.colorLike(bitmap.getPixel(overGreenPoint.x, overGreenPoint.y), ColorUtil.greenOverColor, 10, labColorLike)) {
+            onJump.showBtn(false);
+            SystemClock.sleep(300);
+            bitmap = ScreenRecordUtil.getInstance().getScreenShot();
             saveGrade(bitmap);
             onJump.jumpStart(jumpErroX, jumpErroY, 10);
             SystemClock.sleep(WHITETIME);
             saveBitmap();
             startTime = System.currentTimeMillis();
+            onJump.showBtn(true);
             return;
         } else if (ColorUtil.colorLike(bitmap.getPixel(200, 1734), ColorUtil.blackColor, 10, labColorLike)
                 && ColorUtil.colorLike(bitmap.getPixel(217, 973), ColorUtil.grayColor, 10, labColorLike)
@@ -174,7 +172,7 @@ public class Jump {
 
         final int time = getJumpTime(startPoint, jumpPoint);
         onJump.jumpStart(jumpX, jumpY, time);
-        SystemClock.sleep(WHITETIME+time);
+        SystemClock.sleep(WHITETIME + time);
     }
 
     private void saveGrade(Bitmap bitmap) {
@@ -569,9 +567,9 @@ public class Jump {
     //是否是🎵干扰
     private boolean isDisturb(Bitmap bitmap, int startX, int startY) {
         for (int y = startY; y < startY + 15; y++) {
-            if ((isLikeBg(bitmap, startX, y)&&isLikeBg(bitmap, startX, y+10))
-                    || (isLikeBg(bitmap, startX + (y - startY) / 3, y)&&isLikeBg(bitmap, startX + (y - startY)+10 / 3, y))
-                    || (isLikeBg(bitmap, startX - (y - startY) / 3, y)&&isLikeBg(bitmap, startX - (y - startY) / 3-10, y))) {
+            if ((isLikeBg(bitmap, startX, y) && isLikeBg(bitmap, startX, y + 10))
+                    || (isLikeBg(bitmap, startX + (y - startY) / 3, y) && isLikeBg(bitmap, startX + (y - startY) + 10 / 3, y))
+                    || (isLikeBg(bitmap, startX - (y - startY) / 3, y) && isLikeBg(bitmap, startX - (y - startY) / 3 - 10, y))) {
                 return true;
             }
         }
